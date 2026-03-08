@@ -1,0 +1,36 @@
+# --- Ambientes Virtuais (Virtual Environments) ---
+venv-lr/
+.venv-lr/
+venv/
+.venv/
+env/
+.env/
+# --- Python & Compilação ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Variáveis de Ambiente e Segredos (CRÍTICO) ---
+.env
+cofre/
+*.env
+*.log
+# --- Dados e Arquivos de Entrada/Saída ---
+Logs/
+Main/
+Data/
+*.csv
+*.pdf
+*.xlsx
+*.xls
+*.json
+
+# --- Arquivos do Sistema Operacional e IDEs (Recomendado) ---
+.DS_Store
+.vscode/
+.idea/
+
+# --- Arquivos de inspeção e debug ---
+inspecionar.py
+
+*.db
