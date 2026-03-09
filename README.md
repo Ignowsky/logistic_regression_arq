@@ -1,125 +1,128 @@
-# 🛡️ ARQ People Analytics - Turnover Prediction
+# 📊 Arq People Analytics: Turnover Preditivo
 
-> **"Prever o futuro não é mágica, é matemática aplicada com visão de negócio."**
-> 
-> Um ecossistema completo de *People Analytics* e *Machine Learning* construído para antecipar a evasão de talentos (Turnover) antes que a carta de demissão chegue ao RH.
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.135.0-009688.svg)
+![Scikit-Learn](https://img.shields.io/badge/Machine%20Learning-Scikit--Learn-orange.svg)
+![Plotly](https://img.shields.io/badge/Data%20Viz-Plotly-purple.svg)
 
-Este projeto transcende um simples modelo de predição; trata-se de um **SaaS Corporativo Full-Stack**. Ele possui uma esteira MLOps autônoma (Backend) e uma Unidade de Inteligência de alta performance (Frontend) construída com design system premium (Dark Mode/Glassmorphism), protegida por autenticação e gestão de acessos via banco de dados relacional.
+[![Acessar Sistema](https://img.shields.io/badge/🟢_Live_Demo-Acessar_Plataforma-success?style=for-the-badge)](https://arq-people-analytics-platform.onrender.com)
 
----
-
-## 🚀 O Impacto de Negócio (Visão de Business Partner)
-
-Perder um talento chave sangra o caixa da empresa (custos de rescisão, recrutamento, curva de aprendizado). O objetivo deste ecossistema é munir a diretoria (C-Level) e os BPs de RH com dados irrefutáveis e alertas de risco imediato.
-
-* **Alta Sensibilidade (Recall Otimizado):** O algoritmo de Machine Learning foi calibrado para minimizar falsos negativos. É preferível que o RH faça uma entrevista de retenção preventiva do que ser pego de surpresa por uma demissão crítica.
-* **Inteligência de Tempo Real:** Painel atualizado dinamicamente que cruza equidade salarial, demografia e tempo de casa.
-* **Target List Acionável:** Uma "Fila de Prioridade" exportável que elenca os colaboradores ativos com probabilidade de fuga (Risco > 70%), cruzando as variáveis que mais impactam o negócio.
+Uma plataforma end-to-end de People Analytics focada em prever e mitigar a evasão de talentos...
 
 ---
 
-## 🧠 Arquitetura do Sistema (O Megazord)
+## 🎯 1. The Problem (O Problema)
+O Turnover oculto sangra o caixa das empresas. Tradicionalmente, o RH atua de forma **reativa**: a gestão de pessoas só entra em cena *depois* que o talento já entregou a carta de demissão. O custo de reposição, perda de capital intelectual e quebra de produtividade são incalculáveis.
 
-O projeto é dividido em dois grandes núcleos: a **Esteira MLOps** (Extração, Tratamento e Treinamento) e o **Web App Executivo** (API e Dashboard).
+**A Solução:** Inverter o jogo para uma atuação **preditiva**. Esta plataforma ingere dados históricos do Data Warehouse corporativo, treina um modelo de inteligência artificial para identificar padrões de evasão e entrega para os Business Partners uma *Target List* em tempo real: os colaboradores com maior risco de saída, permitindo ações de retenção antes que o pior aconteça.
 
-### 🛠️ Tech Stack (O Cinto de Utilidades)
-* **Backend & API:** `FastAPI`, `Uvicorn`, `Python 3.10+`
-* **Engenharia de Dados & ML:** `Pandas`, `NumPy`, `Scikit-Learn` (Logistic Regression, StandardScaler), `Imbalanced-Learn` (SMOTE)
-* **Banco de Dados (Conexão e CRUD):** `PostgreSQL` (DW de origem), `SQLite` (Gestão de Acessos do Dashboard), `SQLAlchemy`
-* **Frontend Analytics:** `HTML5`, `CSS3` (Apple-inspired UI), `Vanilla JS`, `Plotly.js` (Visualização de Dados), `SheetJS` (Exportação Excel)
+---
 
-### 📂 Estrutura de Diretórios
+## 🏗️ 2. Architecture (A Arquitetura)
+O sistema não é um simples script analítico, mas um microsserviço completo com esteira de MLOps acoplada. Toda a extração, limpeza, engenharia de features e retreino acontecem em background, isolados da camada de visualização.
+
+```mermaid
+flowchart LR
+  subgraph Data Source
+    DW[(PostgreSQL DW\nCorporate Data)]
+  end
+  
+  subgraph MLOps Pipeline / Backend
+    EXT[Data Extraction] --> CLN[Data Cleaning]
+    CLN --> FE[Feature Engineering]
+    FE --> TR[Model Training\nLogReg + SMOTE]
+    TR -->|Pickle Output| MOD[(Model Artifact)]
+  end
+  
+  subgraph Web Service & Analytics
+    API[FastAPI Server]
+    API <--> MOD
+    API <-->|REST API / JSON| UI[Frontend\nPlotly + JS]
+  end
+  
+  DW --> EXT
+```
+---
+
+## 🗄️ 3. Data Model (Modelo de Dados)
+A origem dos dados é uma OBT *(One Big Table)* extraída de uma View consolidada **(`vw_obt_turnover_lr`)** no Data Warehouse da empresa.
+As principais dimensões englobam:
+
+- **Demografia:** Idade, Gênero, Estado Civil.
+
+- **Organização:** Departamento, Tempo de Casa (Maturidade), Escolaridade.
+
+- **Comportamental:** Perfil Solides (Comunicador, Executor, Planejador, Analista).
+
+- **Financeiro/Benefícios:** Salário Contratual, Quantidade de Dependentes.
+
+- **Target:** `target_pediu_demissao` (Variável Binária).
+---
+
+## 🧠 4. Analytics & Machine Learning (O Motor)
+A abordagem de IA foi construída com foco em **Explicabilidade (XAI)**, para que o RH confie nos resultados.
+
+- **Algoritmo Base:** Regressão Logística (solver='liblinear'). Diferente de modelos "caixa preta", a Regressão Logística nos dá os pesos exatos de cada variável no risco de saída.
+
+- **Desbalanceamento de Classes:** Como (felizmente) há mais colaboradores ativos do que demissões, utilizamos ***SMOTE (Synthetic Minority Over-sampling Technique)*** nativo do `imbalanced-learn` no pipeline, além do hiperparâmetro `class_weight='balanced'`.
+
+- **Feature Engineering:** Agrupamento de perfis com baixa volumetria, criação de flags binárias para departamentos críticos e cálculo de Tenure (Tempo de Casa) automatizado pela data de corte.
+
+---
+## 💻 5. Results & UI (Vitrine de Dados)
+O Frontend foi construído sem frameworks pesados, utilizando HTML5, CSS3 avançado (Glassmorphism/Apple-like UX) e JavaScript Vanilla conectando com **Plotly.js** para renderização gráfica no lado do cliente, aliviando o servidor.
+
+- **Análise Univariada e Bivariada:** KDE Plots de distribuição salarial, Boxplots de idade vs gênero e Dispersão de maturidade.
+
+- **Target List:**  Exportação em CSV dos top 50 colaboradores com maior risco probabilístico de evasão.
+
+### Visão Geral (Tela Inicial)
+![visao_geral.png](assets/visao_geral.png)
+
+### Análise Univariada
+![exemplo_univariada.png](assets/exemplo_univariada.png)
+
+### Análise Bivariada
+![Analise_Bivariada.png](assets/Analise_Bivariada.png)
+
+---
+
+## 🚀 6. How to Run (Como Executar o Megazord)
+
+**Pré-requisitos:** Python 3.10+ e um banco de dados PostgreSQL rodando a view do projeto.
+1. **Clone o repositório:**
 ```bash
-📦 logistic_regression_arq
- ┣ 📂 Data
- ┃ ┣ 📂 Processed       # Checkpoints com dados limpos e features forjadas
- ┃ ┗ 📂 Raw             # Backup bruto extraído do DW
- ┣ 📂 Logs              # Matrizes de Confusão e auditoria de treinamento
- ┣ 📂 Models            # Cérebro da IA (Pipeline .pkl exportado)
- ┣ 📂 Src               # O Batalhão de Engenharia (Scripts Modulares)
- ┃ ┣ 📜 data_cleaning.py       # Tratamento de nulos e agrupamento de categorias
- ┃ ┣ 📜 data_extraction.py     # Conexão PostgreSQL e extração da OBT
- ┃ ┣ 📜 database.py            # Motor SQLAlchemy lendo o .env
- ┃ ┣ 📜 feature_engineering.py # Forja de variáveis (Idade, Meses de Casa)
- ┃ ┣ 📜 logger.py              # Sistema de Rastreamento
- ┃ ┣ 📜 ml_preprocessing.py    # Split, Prevenção de Leakage e StandardScaler
- ┃ ┗ 📜 train.py               # Orquestração do SMOTE + Regressão Logística
- ┣ 📂 static            # Ativos do Frontend
- ┃ ┣ 📜 index.html             # O Dashboard Corporativo (Bento Grid)
- ┃ ┣ 📜 script.js              # Lógica de renderização Plotly e consumo de API
- ┃ ┗ 📜 style.css              # Design System (Dark Mode, UI/UX)
- ┣ 📜 main.py           # Gatilho da esteira de MLOps
- ┣ 📜 server.py         # Servidor FastAPI (Rotas, CRUD, Servidor de Arquivos)
- ┣ 📜 requirements.txt  # Dependências do projeto
- ┗ 📜 .env              # Credenciais do Banco de Dados (NÃO VERSIONADO)
+git clone [https://github.com/SeuUsuario/arq-people-analytics.git](https://github.com/SeuUsuario/arq-people-analytics.git)
+cd arq-people-analytics
 ```
----
 
-### **🔬 Exploratory Data Analysis (EDA Completa)**
-
-O painel central não apresenta apenas números frios. Ele utiliza o Plotly.js em layout fluído para entregar 8 visualizações estratégicas:
-
-1. **Equidade Salarial (Split Violin Plot)**: Compara a distribuição salarial entre ativos e evasões, dividido por gênero ou perfil.
-
-2. **Sobrevivência (Boxplot)**: Indica o "mês crítico" em que os colaboradores tendem a pedir demissão.
-
-3. **Maturidade x Salário (Scatter Plot)**: Análise bivariada mostrando os clusters de risco no tempo.
-
-4. **Volume por Departamento (Bar Chart)**: Onde está o maior gargalo organizacional.
-
-5. **Pirâmide Etária (Histogram)**: Distribuição demográfica de quem sai vs. quem fica.
-
-6. **Perfil Comportamental (Donut Chart)**: Qual perfil psicológico tem menor adesão à cultura atual.
-
-7. **Carga Familiar (Horizontal Bar)**: Correlação de retenção baseada na quantidade de dependentes.
-
-8. **Matriz de Correlação (Heatmap)**: A prova matemática (Pearson) de quais variáveis impulsionam o turnover.
-
----
-### **⚙️ Como Operar a Infraestrutura Localmente**
-
-1. **Clonar e Instalar**
-
-``` bash
-git clone [https://github.com/Ignowsky/logistic_regression_arq.git](https://github.com/Ignowsky/logistic_regression_arq.git)
-cd logistic_regression_arq
+2. **Crie e ative o ambiente virtual:**
+````bash
 python -m venv venv
-# Ative o venv (Windows: venv\Scripts\activate | Linux/Mac: source venv/bin/activate)
+# No Windows:
+.\venv\Scripts\activate
+# No Linux/Mac:
+source venv/bin/activate
+````
+
+3. **Instale as dependências necessárias:**
+````bash
 pip install -r requirements.txt
-```
+````
 
-2. **Configurar o Cofre (.env)**
-Crie um arquivo .env na raiz do projeto com as credenciais do seu Data Warehouse PostgreSQL:
-
-``` bash
+4. **Configure as Variáveis de Ambiente:**
+Crie um arquivo `.env` na raiz do projeto com as credenciais do seu DW:
+````bash
 DB_USER=seu_usuario
 DB_PASS=sua_senha
-DB_HOST=localhost
+DB_HOST=seu_servidor
 DB_PORT=5432
-DB_NAME=postgres
-DB_SCHEMA=gestao_pessoas
-```
-
-3. **Rodando o Treinamento Inicial (MLOps)**
-Para forçar a primeira extração, limpar os dados, balancear com SMOTE e treinar a Inteligência Artificial:
-
-``` bash
-python main.py
-```
-> (Confira os logs no terminal e os gráficos gerados na pasta /Logs)
-
-4. **Subindo o Servidor Enterprise (Deploy Local)**
-Ligue a API e o Dashboard:
-````bash
-uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+DB_NAME=seu_banco
 ````
->Acesse http://localhost:8000 no seu navegador.
 
-- Acesso Padrão Admin:
-  - Usuário: `admin_rh`
-  - Senha: `123456`
+5. **Inicie o Servidor:**
+```bash
+uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+```
 
----
-
-### **🔄 Retreino Contínuo (Model Drift Prevention)**
-A plataforma possui um módulo embutido de "Gestão de Sistema" (disponível apenas para Administradores logados). Com um único clique no botão "Retreinar IA", o servidor aciona o main.py em background, puxa dados novos do banco, reconstrói a inteligência matemática e atualiza a interface sem precisar derrubar o sistema.
+Acesse `http://localhost:8000` no seu navegador e desfrute.
