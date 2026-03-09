@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arq People Analytics - Dashboard S-Rank</title>
+    <title>Arq People Analytics - Predição de Turnover</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
 </head>
@@ -11,8 +11,8 @@
 
     <div id="login-overlay" class="login-overlay">
         <div class="login-box glass-panel">
-            <img src="https://www.flaticon.com/br/icone-gratis/pessoas_1769039" alt="Logo" class="logo-login" style="filter: invert(0.2) sepia(1) saturate(3) hue-rotate(200deg); width: 50px; margin-bottom: 20px;">
-            <h2>ARQ People Analytics</h2>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Apple-logo.png" alt="Logo" class="logo-login" style="filter: invert(0.2) sepia(1) saturate(3) hue-rotate(200deg); width: 50px; margin-bottom: 20px;">
+            <h2>Arq. P.A. Portal</h2>
             <input type="text" id="username" placeholder="Usuário ou E-mail">
             <input type="password" id="password" placeholder="Senha Forte">
             <button onclick="fazerLogin()">Acessar Sistema</button>
@@ -43,15 +43,15 @@
             <div class="kpi-container">
                 <div class="kpi-card glass-panel">
                     <h3>Headcount Ativo</h3>
-                    <h1 id="kpi-hc">0</h1>
+                    <h1 id="kpi-hc">...</h1>
                 </div>
                 <div class="kpi-card glass-panel">
                     <h3>Taxa de Turnover</h3>
-                    <h1 id="kpi-turnover" style="color: #ff3b30;">0%</h1>
+                    <h1 id="kpi-turnover" style="color: #ff3b30;">...</h1>
                 </div>
                 <div class="kpi-card glass-panel">
                     <h3>Evasões Históricas</h3>
-                    <h1 id="kpi-evasoes">0</h1>
+                    <h1 id="kpi-evasoes">...</h1>
                 </div>
             </div>
 
@@ -61,14 +61,13 @@
                     <div id="chart-departamentos"></div>
                 </div>
                 <div class="chart-card glass-panel">
-                    <h3>Equidade Salarial (Ativos vs Evasões)</h3>
-                    <div id="chart-salario"></div>
+                    <h3>Evasões por Perfil Comportamental</h3>
+                    <div id="chart-perfil"></div>
                 </div>
             </div>
         </div>
 
-       <div id="aba-demografia" class="tab-content">
-
+        <div id="aba-demografia" class="tab-content">
             <h2 style="color: var(--primary-blue); margin-bottom: 20px;">Análises Univariadas (Densidade e Distribuição)</h2>
             <div class="charts-grid-2">
                 <div class="chart-card glass-panel">
@@ -76,18 +75,18 @@
                     <div id="chart-kde-salario"></div>
                 </div>
                 <div class="chart-card glass-panel">
-                    <h3>KDE: Tempo de Casa por Gênero</h3>
+                    <h3>KDE: Tempo de Casa por Gênero/Perfil</h3>
                     <div id="chart-kde-tempo-genero"></div>
                 </div>
             </div>
 
             <div class="charts-grid-2">
                 <div class="chart-card glass-panel">
-                    <h3>Distribuição de Idade por Gênero</h3>
+                    <h3>Distribuição de Idade por Gênero/Perfil</h3>
                     <div id="chart-box-idade-genero"></div>
                 </div>
                 <div class="chart-card glass-panel">
-                    <h3>Composição de Gênero nas Evasões</h3>
+                    <h3>Composição nas Evasões</h3>
                     <div id="chart-pie-genero-evasao"></div>
                 </div>
             </div>
@@ -105,20 +104,12 @@
             </div>
 
             <div class="chart-card glass-panel" style="margin-top: 20px;">
-                <h3>Exportar Target List S-Rank</h3>
-                <p style="color: #666; margin-bottom: 20px;">Lista de colaboradores ativos com maior risco de evasão calculado pela IA.</p>
-                <button class="btn-primary" onclick="baixarTargetList()" style="width: 100%; padding: 15px; font-size: 16px;">⬇️ Baixar Relatório (CSV)</button>
-            </div>
-        </div>
-            <div class="charts-grid-2">
-                <div class="chart-card glass-panel">
-                    <h3>Evasões por Perfil Comportamental</h3>
-                    <div id="chart-perfil"></div>
-                </div>
-                <div class="chart-card glass-panel">
-                    <h3>Exportar Target List S-Rank</h3>
-                    <p style="color: #666; margin-bottom: 20px;">Lista de colaboradores ativos com maior risco de evasão calculado pela IA.</p>
-                    <button class="btn-primary" onclick="baixarTargetList()" style="width: 100%; padding: 15px; font-size: 16px;">⬇️ Baixar Relatório (CSV)</button>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Exportar Target List S-Rank</h3>
+                        <p style="color: #666; margin-top: 5px;">Lista preditiva de colaboradores ativos com maior risco de evasão calculado pela IA.</p>
+                    </div>
+                    <button class="btn-primary" onclick="baixarTargetList()" style="padding: 15px 30px; font-size: 16px;">⬇️ Baixar CSV</button>
                 </div>
             </div>
         </div>
