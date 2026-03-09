@@ -115,9 +115,38 @@ async function criarUsuario() {
 async function deletarUsuario(id) { await fetch(`/api/users/${id}`, { method: 'DELETE' }); listarUsuarios(); }
 
 function exportarTargetList() {
-    if(!globalTargetList.length) return alert("Base vazia.");
-    const ws = XLSX.utils.json_to_sheet(globalTargetList);
-    XLSX.writeFile(XLSX.utils.book_append_sheet(XLSX.utils.book_new(), ws, "Risco"), "Enterprise_TargetList.xlsx");
+    try {
+        console.log("▶️ 1. Botão clicado! Iniciando exportação...");
+
+        // Verifica se a biblioteca SheetJS (XLSX) importada no HTML realmente carregou
+        if (typeof XLSX === 'undefined') {
+            console.error("🚨 A biblioteca do Excel (XLSX) não foi encontrada na memória.");
+            alert("❌ Erro de Rede: O motor do Excel não carregou. Verifique o link <script> no seu index.html.");
+            return;
+        }
+
+        console.log("✅ 2. Motor XLSX ok. Verificando os dados...");
+        console.log("Dados atuais na memória:", globalTargetList);
+
+        if (!globalTargetList || globalTargetList.length === 0) {
+            alert("⚠️ Base vazia. O dashboard não tem dados para exportar agora.");
+            return;
+        }
+
+        console.log("⏳ 3. Montando a estrutura da planilha...");
+        const ws = XLSX.utils.json_to_sheet(globalTargetList);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Risco");
+
+        console.log("📥 4. Disparando o download pro S.O....");
+        XLSX.writeFile(wb, "Enterprise_TargetList.xlsx");
+
+        console.log("✅ 5. Sucesso! Planilha gerada.");
+
+    } catch (erro) {
+        console.error("🚨 Falha catastrófica ao gerar Excel:", erro);
+        alert("Erro interno na exportação. Abra o Console (F12) para ver os detalhes.");
+    }
 }
 
 async function dispararRetreino() {

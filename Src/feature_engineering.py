@@ -21,11 +21,7 @@ def creating_cutoff_date(df):
 
     df_clean = df.copy()
 
-    df_clean['data_corte'] = np.where(
-        df_clean['data_demissao'].notnull(),
-        df_clean['data_demissao'],
-        pd.Timestamp.today()
-    )
+    df_clean['data_corte'] = df_clean['data_demissao'].fillna(pd.Timestamp.today())
 
     return df_clean
 
