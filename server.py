@@ -198,3 +198,7 @@ def get_health_data(departamento: str = "Todos"):
         "tempo_medio": {"ativos": media_tempo_ativos, "evasoes": media_tempo_evasoes}, # O NOVO GRÁFICO
         "target_list": target_list.to_dict(orient="records")
     }
+# 8. Rota Mestra do Front-End (A que traz a Skin da Apple)
+@app.get("/")
+def read_root():
+    return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
