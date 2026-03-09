@@ -1,9 +1,12 @@
+import os
 import pandas as pd
-from pathlib import Path
 import numpy as np
 
-# Removi o import do sqlalchemy que não estava sendo usado aqui pra deixar mais leve
-from logger import setup_logger
+# Importando o logger de forma blindada para o FastAPI e para rodar local
+try:
+    from .logger import setup_logger
+except ImportError:
+    from logger import setup_logger
 
 logger = setup_logger(__name__)
 
@@ -39,7 +42,6 @@ def cleaning_date_type(df, columns):
         if col in df_clean.columns:
             df_clean[col] = pd.to_datetime(df_clean[col], format='mixed', dayfirst=True, errors='coerce')
 
-    # Correção: Agora retorna o df_clean e não o df original
     return df_clean
 
 
@@ -83,17 +85,17 @@ def map_education(df, column='escolaridade'):
 def run_data_cleaning(file_name="obt_turnover_bruta.csv"):
     logger.info("INICIANDO: Orquestração de limpeza de dados (Data Cleaning)...")
 
-    caminho_atual = Path(__file__).resolve().parent
-    raiz_projeto = caminho_atual.parent
+    # O Jutsu de Localização Absoluta S-Rank
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    pasta_raw = raiz_projeto / "Data" / "Raw"
-    pasta_processed = raiz_projeto / "Data" / "Processed"
+    pasta_raw = os.path.join(BASE_DIR, "Data", "Raw")
+    pasta_processed = os.path.join(BASE_DIR, "Data", "Processed")
 
-    pasta_processed.mkdir(parents=True, exist_ok=True)
+    # Garante a existência da pasta no servidor Linux
+    os.makedirs(pasta_processed, exist_ok=True)
 
-    caminho_entrada = pasta_raw / file_name
-    # Correção: Mudamos de pasta_raw para pasta_processed
-    caminho_saida = pasta_processed / "obt_turnover_limpo.csv"
+    caminho_entrada = os.path.join(pasta_raw, file_name)
+    caminho_saida = os.path.join(pasta_processed, "obt_turnover_limpo.csv")
 
     try:
         df = pd.read_csv(caminho_entrada)
