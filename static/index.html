@@ -67,17 +67,49 @@
             </div>
         </div>
 
-        <div id="aba-demografia" class="tab-content">
+       <div id="aba-demografia" class="tab-content">
+
+            <h2 style="color: var(--primary-blue); margin-bottom: 20px;">Análises Univariadas (Densidade e Distribuição)</h2>
             <div class="charts-grid-2">
                 <div class="chart-card glass-panel">
-                    <h3>Tempo Médio de Casa (Retenção)</h3>
-                    <div id="chart-tempo-medio"></div>
+                    <h3>KDE: Distribuição Salarial (Ativos vs Evasões)</h3>
+                    <div id="chart-kde-salario"></div>
                 </div>
                 <div class="chart-card glass-panel">
-                    <h3>Dispersão: Salário vs Maturidade</h3>
-                    <div id="chart-dispersao"></div>
+                    <h3>KDE: Tempo de Casa por Gênero</h3>
+                    <div id="chart-kde-tempo-genero"></div>
                 </div>
             </div>
+
+            <div class="charts-grid-2">
+                <div class="chart-card glass-panel">
+                    <h3>Distribuição de Idade por Gênero</h3>
+                    <div id="chart-box-idade-genero"></div>
+                </div>
+                <div class="chart-card glass-panel">
+                    <h3>Composição de Gênero nas Evasões</h3>
+                    <div id="chart-pie-genero-evasao"></div>
+                </div>
+            </div>
+
+            <h2 style="color: var(--primary-blue); margin-top: 40px; margin-bottom: 20px;">Análises Bivariadas (Correlações e Dispersão)</h2>
+            <div class="charts-grid-2">
+                <div class="chart-card glass-panel">
+                    <h3>Dispersão: Salário vs Maturidade (Tempo de Casa)</h3>
+                    <div id="chart-scatter-maturidade"></div>
+                </div>
+                <div class="chart-card glass-panel">
+                    <h3>Dispersão: Salário vs Idade</h3>
+                    <div id="chart-scatter-idade"></div>
+                </div>
+            </div>
+
+            <div class="chart-card glass-panel" style="margin-top: 20px;">
+                <h3>Exportar Target List S-Rank</h3>
+                <p style="color: #666; margin-bottom: 20px;">Lista de colaboradores ativos com maior risco de evasão calculado pela IA.</p>
+                <button class="btn-primary" onclick="baixarTargetList()" style="width: 100%; padding: 15px; font-size: 16px;">⬇️ Baixar Relatório (CSV)</button>
+            </div>
+        </div>
             <div class="charts-grid-2">
                 <div class="chart-card glass-panel">
                     <h3>Evasões por Perfil Comportamental</h3>

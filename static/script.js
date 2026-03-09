@@ -87,54 +87,94 @@ async function carregarDados() {
     document.getElementById('kpi-evasoes').innerText = data.kpis.evasoes;
 
     // Cores Apple S-Rank
-    const corAtivos = '#34c759'; // Verde Sucesso
-    const corEvasoes = '#ff3b30'; // Vermelho Alerta
-    const corPrimaria = '#2a388f'; // Arq Azul
+// Cores Apple S-Rank
+    const corAtivos = 'rgba(52, 199, 89, 0.7)'; // Verde Sucesso Transparente
+    const corEvasoes = 'rgba(255, 59, 48, 0.7)'; // Vermelho Alerta Transparente
+    const corM = '#2a388f'; // Azul Masculino/Geral
+    const corF = '#ff2d55'; // Rosa Apple Feminino
 
-    // Gráfico 1: Evasões por Departamento
-    Plotly.newPlot('chart-departamentos', [{
-        x: data.departamentos.nomes,
-        y: data.departamentos.evasoes,
-        type: 'bar',
-        marker: { color: corPrimaria, opacity: 0.8 }
-    }], { margin: { t: 20 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)' });
+    // PREPARAÇÃO DOS DADOS (Fatiando o JSON pra não repetir código)
+    const eda = data.eda_avancada;
 
-    // Gráfico 2: Equidade Salarial (Violin)
-    Plotly.newPlot('chart-salario', [
-        { type: 'violin', y: data.eda_avancada.salario.filter((_,i)=>data.eda_avancada.status[i]===0), name: 'Ativos', side: 'negative', line: {color: corAtivos} },
-        { type: 'violin', y: data.eda_avancada.salario.filter((_,i)=>data.eda_avancada.status[i]===1), name: 'Evasões', side: 'positive', line: {color: corEvasoes} }
-    ], { margin: { t: 20 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', violingap: 0, violinmode: 'overlay' });
+    // Arrays filtrados por Status
+    const sal_ativos = eda.salario.filter((_,i) => eda.status[i] === 0);
+    const sal_evasoes = eda.salario.filter((_,i) => eda.status[i] === 1);
 
-    // 🔥 O NOVO GRÁFICO: Tempo Médio de Casa (Ativos vs Evasões)
-    Plotly.newPlot('chart-tempo-medio', [{
-        x: ['Colaboradores Ativos', 'Evasões (Saídas)'],
-        y: [data.tempo_medio.ativos, data.tempo_medio.evasoes],
-        type: 'bar',
-        text: [data.tempo_medio.ativos + ' meses', data.tempo_medio.evasoes + ' meses'],
-        textposition: 'auto',
-        marker: { color: [corAtivos, corEvasoes], opacity: 0.9 }
-    }], {
-        margin: { t: 20 },
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        yaxis: { title: 'Meses de Casa' }
-    });
+    const tempo_ativos = eda.tempo.filter((_,i) => eda.status[i] === 0);
+    const tempo_evasoes = eda.tempo.filter((_,i) => eda.status[i] === 1);
 
-    // Gráfico 4: Dispersão Salário vs Maturidade
-    Plotly.newPlot('chart-dispersao', [
-        { x: data.eda_avancada.tempo.filter((_,i)=>data.eda_avancada.status[i]===0), y: data.eda_avancada.salario.filter((_,i)=>data.eda_avancada.status[i]===0), mode: 'markers', name: 'Ativos', marker: {color: 'rgba(52, 199, 89, 0.4)'} },
-        { x: data.eda_avancada.tempo.filter((_,i)=>data.eda_avancada.status[i]===1), y: data.eda_avancada.salario.filter((_,i)=>data.eda_avancada.status[i]===1), mode: 'markers', name: 'Evasões', marker: {color: corEvasoes, symbol: 'diamond'} }
-    ], { margin: { t: 20 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)' });
+    const idade_ativos = eda.idade.filter((_,i) => eda.status[i] === 0);
+    const idade_evasoes = eda.idade.filter((_,i) => eda.status[i] === 1);
 
-    // Gráfico 5: Evasões por Perfil Comportamental
-    Plotly.newPlot('chart-perfil', [{
-        labels: data.perfil.nomes,
-        values: data.perfil.valores,
+    // Arrays filtrados por Gênero (Assumindo M e F ou Perfil se Gênero não existir)
+    // Se a sua base tiver "Masculino/Feminino", ajuste aqui, mas o filter genérico pega o que vier
+    const generos_unicos = [...new Set(eda.genero)];
+    const gen1 = generos_unicos[0];
+    const gen2 = generos_unicos[1] || 'Outro';
+
+    const tempo_gen1 = eda.tempo.filter((_,i) => eda.genero[i] === gen1);
+    const tempo_gen2 = eda.tempo.filter((_,i) => eda.genero[i] === gen2);
+
+    const idade_gen1 = eda.idade.filter((_,i) => eda.genero[i] === gen1);
+    const idade_gen2 = eda.idade.filter((_,i) => eda.genero[i] === gen2);
+
+    // Layout padrão pra manter o fundo transparente e limpo (Padrão Apple)
+    const layoutKDE = { margin: { t: 20 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', showlegend: true };
+
+    // -------------------------------------------------------------
+    // 1. KDE: Distribuição Salarial (Ativos vs Evasões) - Sem o "pulmão murcho"
+    // Usamos Histograma com densidade de probabilidade e formato de curva (KDE real)
+    // -------------------------------------------------------------
+    Plotly.newPlot('chart-kde-salario', [
+        { x: sal_ativos, type: 'histogram', histnorm: 'probability density', name: 'Ativos', marker: {color: corAtivos} },
+        { x: sal_evasoes, type: 'histogram', histnorm: 'probability density', name: 'Evasões', marker: {color: corEvasoes} }
+    ], { ...layoutKDE, barmode: 'overlay', xaxis: {title: 'Salário (R$)'}, yaxis: {visible: false} });
+
+    // -------------------------------------------------------------
+    // 2. KDE: Tempo de Casa por Gênero (Violin Plot completo, deitado)
+    // -------------------------------------------------------------
+    Plotly.newPlot('chart-kde-tempo-genero', [
+        { type: 'violin', x: tempo_gen1, name: gen1, line: {color: corM}, side: 'both', orientation: 'h', meanline: {visible: true} },
+        { type: 'violin', x: tempo_gen2, name: gen2, line: {color: corF}, side: 'both', orientation: 'h', meanline: {visible: true} }
+    ], { ...layoutKDE, xaxis: {title: 'Meses de Casa'} });
+
+    // -------------------------------------------------------------
+    // 3. Distribuição de Idade por Gênero (Box Plot)
+    // -------------------------------------------------------------
+    Plotly.newPlot('chart-box-idade-genero', [
+        { y: idade_gen1, type: 'box', name: gen1, marker: {color: corM}, boxpoints: 'outliers' },
+        { y: idade_gen2, type: 'box', name: gen2, marker: {color: corF}, boxpoints: 'outliers' }
+    ], { ...layoutKDE, yaxis: {title: 'Idade'} });
+
+    // -------------------------------------------------------------
+    // 4. Composição de Gênero nas Evasões (Gráfico de Rosca)
+    // -------------------------------------------------------------
+    const evasao_por_genero = eda.genero.filter((_,i) => eda.status[i] === 1);
+    const counts_genero = generos_unicos.map(g => evasao_por_genero.filter(x => x === g).length);
+
+    Plotly.newPlot('chart-pie-genero-evasao', [{
+        labels: generos_unicos,
+        values: counts_genero,
         type: 'pie',
-        hole: 0.4,
-        marker: { colors: [corPrimaria, '#4c5ad6', '#7a85e0', '#a8b0eb', '#d6dcf5'] }
-    }], { margin: { t: 20, b:20 }, paper_bgcolor: 'rgba(0,0,0,0)' });
-}
+        hole: 0.5,
+        marker: { colors: [corM, corF, '#a8b0eb'] }
+    }], layoutKDE);
+
+    // -------------------------------------------------------------
+    // 5. Bivariada: Dispersão de Salário vs Maturidade (Meses de Casa)
+    // -------------------------------------------------------------
+    Plotly.newPlot('chart-scatter-maturidade', [
+        { x: tempo_ativos, y: sal_ativos, mode: 'markers', name: 'Ativos', marker: {color: corAtivos, size: 8, line: {width: 1, color: 'white'}} },
+        { x: tempo_evasoes, y: sal_evasoes, mode: 'markers', name: 'Evasões', marker: {color: corEvasoes, symbol: 'diamond', size: 8, line: {width: 1, color: 'white'}} }
+    ], { ...layoutKDE, xaxis: {title: 'Maturidade (Meses de Casa)'}, yaxis: {title: 'Salário (R$)'} });
+
+    // -------------------------------------------------------------
+    // 6. Bivariada: Dispersão de Salário vs Idade
+    // -------------------------------------------------------------
+    Plotly.newPlot('chart-scatter-idade', [
+        { x: idade_ativos, y: sal_ativos, mode: 'markers', name: 'Ativos', marker: {color: corAtivos, size: 8, line: {width: 1, color: 'white'}} },
+        { x: idade_evasoes, y: sal_evasoes, mode: 'markers', name: 'Evasões', marker: {color: corEvasoes, symbol: 'diamond', size: 8, line: {width: 1, color: 'white'}} }
+    ], { ...layoutKDE, xaxis: {title: 'Idade'}, yaxis: {title: 'Salário (R$)'} });
 
 // --- TARGET LIST ---
 function baixarTargetList() {

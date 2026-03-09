@@ -188,14 +188,20 @@ def get_health_data(departamento: str = "Todos"):
         "kpis": {"headcount": hc_real, "evasoes": len(demitidos), "taxa_turnover": taxa_turnover},
         "departamentos": {"nomes": hc_dep.index.tolist(), "headcount": hc_dep.values.tolist(),
                           "evasoes": evasao_dep.reindex(hc_dep.index, fill_value=0).values.tolist()},
-        "eda_avancada": {"genero": df_filtered[col_genero].tolist(),
-                         "salario": df_filtered['salario_contratual'].tolist(),
-                         "status": df_filtered['target_pediu_demissao'].tolist(),
-                         "tempo": df_filtered['meses_de_casa'].tolist()},
+
+        # 🔥 AQUI ESTÁ A MUDANÇA (Adicionado a Idade para os Scatter Plots)
+        "eda_avancada": {
+            "genero": df_filtered[col_genero].tolist(),
+            "salario": df_filtered['salario_contratual'].tolist(),
+            "status": df_filtered['target_pediu_demissao'].tolist(),
+            "tempo": df_filtered['meses_de_casa'].tolist(),
+            "idade": df_filtered['idade'].tolist()
+        },
+
         "demografia": {"idade_ativos": idade_ativos, "idade_demitidos": idade_demitidos},
         "correlacao": {"z": matriz_corr.values.tolist(), "eixos": nomes_eixos},
         "perfil": {"nomes": evasao_perfil.index.tolist(), "valores": evasao_perfil.values.tolist()},
-        "tempo_medio": {"ativos": media_tempo_ativos, "evasoes": media_tempo_evasoes}, # O NOVO GRÁFICO
+        "tempo_medio": {"ativos": media_tempo_ativos, "evasoes": media_tempo_evasoes},
         "target_list": target_list.to_dict(orient="records")
     }
 # 8. Rota Mestra do Front-End (A que traz a Skin da Apple)
